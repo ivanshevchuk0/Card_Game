@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: sp1
   m_EditorClassIdentifier: 
   cardName: 
-  cardSprite: {fileID: 1910712771, guid: 945d85bcce264c1428c379141b74b0e9, type: 3}
+  cardSprite: {fileID: -1558365409, guid: 945d85bcce264c1428c379141b74b0e9, type: 3}
   description: 
   POWER: 0
   element: 0
-  ability: 0
+  ability: 5
   abilityValue: 1
   abilityHighlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   abilityIcon: {fileID: 0}
