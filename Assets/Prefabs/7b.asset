@@ -12,5 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c521d3f098dfc08459a91f8dc8a48599, type: 3}
   m_Name: 7b
   m_EditorClassIdentifier: 
+  cardName: 
   cardSprite: {fileID: -1913544299, guid: 945d85bcce264c1428c379141b74b0e9, type: 3}
   POWER: 7
+  element: 0
+  description: 
