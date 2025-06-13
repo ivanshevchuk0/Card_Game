@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CardGameController : MonoBehaviour
 {
@@ -25,6 +26,10 @@ public class CardGameController : MonoBehaviour
     [SerializeField] private Color waterColor = Color.blue;
     [SerializeField] private Color earthColor = Color.green;
     
+    [Header("Ability System")]
+    [SerializeField] private GameObject abilityMessagePrefab;
+    [SerializeField] private float abilityMessageDuration = 2f;
+    
     [Header("UI Elements")]
     [SerializeField] private TMPro.TextMeshProUGUI playerCardCountText;
     [SerializeField] private TMPro.TextMeshProUGUI computerCardCountText;
@@ -41,12 +46,10 @@ public class CardGameController : MonoBehaviour
 
     public void InitializeGame()
     {
-        // Clear hands and shuffle
         playerHand.Clear();
         computerHand.Clear();
         deck = deck.OrderBy(card => Random.value).ToList();
         
-        // Deal starting cards
         for (int i = 0; i < startingCards && deck.Count >= 2; i++)
         {
             playerHand.Add(deck[0]);
@@ -92,7 +95,6 @@ public class CardGameController : MonoBehaviour
         DisplayCardInCenter(playerCard, compCard);
         ApplyElementalEffects(playerCard, compCard);
         
-        // Calculate elemental advantages
         int playerPower = CalculateElementalPower(playerCard, compCard);
         int compPower = CalculateElementalPower(compCard, playerCard);
         
@@ -102,16 +104,26 @@ public class CardGameController : MonoBehaviour
             resultMessage = $"Player wins! {playerCard.cardName} ({playerPower}) beats {compCard.cardName} ({compPower})";
             playerHand.Add(playerCard);
             playerHand.Add(compCard);
+            
+            // Trigger abilities
+            AbilitySystem.TriggerAbility(playerCard.ability, playerCard.abilityValue, this, playerCard, compCard, true);
+            AbilitySystem.TriggerAbility(compCard.ability, compCard.abilityValue, this, compCard, playerCard, false);
         }
         else if (playerPower < compPower)
         {
             resultMessage = $"Computer wins! {compCard.cardName} ({compPower}) beats {playerCard.cardName} ({playerPower})";
             computerHand.Add(playerCard);
             computerHand.Add(compCard);
+            
+            // Trigger abilities
+            AbilitySystem.TriggerAbility(compCard.ability, compCard.abilityValue, this, compCard, playerCard, true);
+            AbilitySystem.TriggerAbility(playerCard.ability, playerCard.abilityValue, this, playerCard, compCard, false);
         }
         else
         {
             resultMessage = $"Draw! Both cards have power {playerPower}";
+            deck.Add(playerCard);
+            deck.Add(compCard);
         }
         
         resultText.text = resultMessage;
@@ -139,24 +151,16 @@ public class CardGameController : MonoBehaviour
         switch (card.element)
         {
             case ElementType.Fire:
-                if (opponentCard.element == ElementType.Earth) 
-                    return basePower * 2;
-                if (opponentCard.element == ElementType.Water) 
-                    return basePower / 2;
+                if (opponentCard.element == ElementType.Earth) return basePower * 2;
+                if (opponentCard.element == ElementType.Water) return basePower / 2;
                 break;
-                
             case ElementType.Water:
-                if (opponentCard.element == ElementType.Fire) 
-                    return basePower * 2;
-                if (opponentCard.element == ElementType.Earth) 
-                    return basePower / 2;
+                if (opponentCard.element == ElementType.Fire) return basePower * 2;
+                if (opponentCard.element == ElementType.Earth) return basePower / 2;
                 break;
-                
             case ElementType.Earth:
-                if (opponentCard.element == ElementType.Water) 
-                    return basePower * 2;
-                if (opponentCard.element == ElementType.Fire) 
-                    return basePower / 2;
+                if (opponentCard.element == ElementType.Water) return basePower * 2;
+                if (opponentCard.element == ElementType.Fire) return basePower / 2;
                 break;
         }
         
@@ -165,17 +169,10 @@ public class CardGameController : MonoBehaviour
 
     private void ApplyElementalEffects(CardDataSO playerCard, CardDataSO compCard)
     {
-        // Player card effect
         if (playerCard.element != ElementType.None)
-        {
             CreateElementEffect(playerCenterPos.position, playerCard.element);
-        }
-        
-        // Computer card effect
         if (compCard.element != ElementType.None)
-        {
             CreateElementEffect(computerCenterPos.position, compCard.element);
-        }
     }
 
     private void CreateElementEffect(Vector3 position, ElementType element)
@@ -193,10 +190,8 @@ public class CardGameController : MonoBehaviour
 
         Vector3 playerCenter = playerSpawn.position;
         Vector3 computerCenter = computerSpawn.position;
-
         Quaternion rotation = Quaternion.Euler(0, 0, 0);
 
-        // Display player hand (face down)
         for (int i = 0; i < playerHand.Count; i++)
         {
             Vector3 offset = new Vector3(i * 1.1f, 0, 0);
@@ -205,7 +200,6 @@ public class CardGameController : MonoBehaviour
             card.tag = "Card";
         }
 
-        // Display computer hand (face down)
         for (int i = 0; i < computerHand.Count; i++)
         {
             Vector3 offset = new Vector3(i * 1.1f, 0, 0);
@@ -218,24 +212,35 @@ public class CardGameController : MonoBehaviour
     void DisplayCardInCenter(CardDataSO pCard, CardDataSO cCard)
     {
         // Player card
-        GameObject playerCardCenter = Instantiate(cardPrefab, playerCenterPos.position, Quaternion.identity);
-        playerCardCenter.GetComponent<SpriteRenderer>().sprite = pCard.cardSprite;
-        playerCardCenter.GetComponent<CardData>().SetCard(pCard);
-        playerCardCenter.tag = "Card";
-        AddElementIndicator(playerCardCenter, pCard.element);
-
+        GameObject playerCardCenter = CreateCard(pCard, playerCenterPos.position);
         // Computer card
-        GameObject compCardCenter = Instantiate(cardPrefab, computerCenterPos.position, Quaternion.identity);
-        compCardCenter.GetComponent<SpriteRenderer>().sprite = cCard.cardSprite;
-        compCardCenter.GetComponent<CardData>().SetCard(cCard);
-        compCardCenter.tag = "Card";
-        AddElementIndicator(compCardCenter, cCard.element);
+        GameObject compCardCenter = CreateCard(cCard, computerCenterPos.position);
+    }
+
+    private GameObject CreateCard(CardDataSO cardData, Vector3 position)
+    {
+        GameObject card = Instantiate(cardPrefab, position, Quaternion.identity);
+        card.GetComponent<SpriteRenderer>().sprite = cardData.cardSprite;
+        card.GetComponent<CardData>().SetCard(cardData);
+        card.tag = "Card";
+        
+        // Add element indicator
+        if (cardData.element != ElementType.None)
+        {
+            AddElementIndicator(card, cardData.element);
+        }
+        
+        // Add ability indicator
+        if (cardData.ability != AbilityType.None)
+        {
+            AddAbilityIndicator(card, cardData);
+        }
+        
+        return card;
     }
 
     private void AddElementIndicator(GameObject card, ElementType element)
     {
-        if (element == ElementType.None) return;
-        
         GameObject indicator = new GameObject("ElementIndicator");
         indicator.transform.SetParent(card.transform);
         indicator.transform.localPosition = new Vector3(0, -0.5f, -0.1f);
@@ -243,6 +248,20 @@ public class CardGameController : MonoBehaviour
         sr.sprite = GetElementSprite(element);
         sr.color = GetElementColor(element);
         sr.sortingOrder = 1;
+    }
+
+    private void AddAbilityIndicator(GameObject card, CardDataSO cardData)
+    {
+        GameObject indicator = new GameObject("AbilityIndicator");
+        indicator.transform.SetParent(card.transform);
+        indicator.transform.localPosition = new Vector3(0, 0.5f, -0.1f);
+        
+        SpriteRenderer sr = indicator.AddComponent<SpriteRenderer>();
+        sr.sprite = cardData.abilityIcon;
+        sr.color = cardData.abilityHighlightColor;
+        sr.sortingOrder = 2;
+        
+        indicator.AddComponent<AbilityPulse>();
     }
 
     private Sprite GetElementSprite(ElementType element)
@@ -271,6 +290,52 @@ public class CardGameController : MonoBehaviour
         {
             Destroy(go);
         }
+    }
+
+    // Ability system methods
+    public void DrawCards(int count)
+    {
+        for (int i = 0; i < count && deck.Count > 0; i++)
+        {
+            playerHand.Add(deck[0]);
+            deck.RemoveAt(0);
+        }
+        UpdateUI();
+    }
+
+    public void StealCard(CardDataSO card)
+    {
+        playerHand.Add(card);
+        computerHand.Remove(card);
+        UpdateUI();
+    }
+
+    public void DestroyCard(CardDataSO card)
+    {
+        // Could implement discard pile logic here
+        UpdateUI();
+    }
+
+    public void BoostCardPower(CardDataSO card, float multiplier)
+    {
+        card.POWER = Mathf.RoundToInt(card.POWER * multiplier);
+    }
+
+    public void ReviveRandomCard()
+    {
+        if (deck.Count > 0)
+        {
+            playerHand.Add(deck[0]);
+            deck.RemoveAt(0);
+            UpdateUI();
+        }
+    }
+
+    public void ShowAbilityMessage(string message)
+    {
+        GameObject msg = Instantiate(abilityMessagePrefab, transform);
+        msg.GetComponent<TMPro.TextMeshProUGUI>().text = message;
+        Destroy(msg, abilityMessageDuration);
     }
 
     private void UpdateUI()
