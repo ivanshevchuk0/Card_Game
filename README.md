@@ -1,91 +1,175 @@
-Core Gameplay Mechanics
-1. **Basic Card Battle System**
-   - Player vs Computer card comparison
-   - Random card selection from hands
-   - Power value comparison to determine round winner
-   - Win/lose/draw conditions
+# Card Game
 
-2. **Deck System**
-   - Shuffled deck at game start
-   - Drawing cards for both players
-   - Card removal from deck when drawn
-   - Starting hand size configuration
+![image1](image1)
 
-3. **Hand Management**
-   - Visual representation of cards in hand
-   - Face-down display for opponent's cards
-   - Card count tracking
+## Описание проекта
 
-### Elemental Affinity System
-4. **Element Types**
-   - Fire, Water, Earth elements
-   - Neutral (None) element type
+**Card Game** — это прототип карточной игры на Unity, реализующий базовые механики сравнения карт, элементальные эффекты, способности и визуальные фидбэки. Игра предназначена для демонстрации архитектуры с использованием префабов, Scriptable Objects, событий и визуальных эффектов.
 
-5. **Elemental Strengths/Weaknesses**
-   - Fire beats Earth (2x power)
-   - Earth beats Water (2x power)
-   - Water beats Fire (2x power)
-   - Weak elements deal half damage
+В игре два участника: игрок и компьютер. Каждый раунд соперники раскрывают карты, сравнивают значения и элементы, а способности и эффекты добавляют стратегическую глубину в процесс.
 
-6. **Elemental Visuals**
-   - Colored particle effects during battles
-   - Element icons on cards
-   - Color-coded element indicators
+---
 
-### Special Ability System
-7. **Ability Types**
-   - Draw Extra: Draw additional cards on win
-   - Steal Card: Take opponent's card on win
-   - Destroy on Loss: Remove opponent's card when losing
-   - Double Power: Boost power when losing
-   - Revive Random: Bring back a random card from deck
+## Скриншоты
 
-8. **Ability Triggers**
-   - On-win abilities
-   - On-loss abilities
-   - Conditional activation
+### Главная сцена и структура объектов
+![image1](image1)
+_Иерархия сцены, контроллер игры, спавны и префабы карт._
 
-9. **Ability Visuals**
-   - Pulsing ability indicators
-   - Unique icons for each ability type
-   - Highlight colors for ability cards
-   - Ability activation messages
+### Процесс баттла и консоль ошибок
+![image2](image2)
+_Раунд сравнения карт, отображение ошибок и логов в консоли Unity._
 
-### Visual Feedback Systems
-10. **Card Display**
-    - Different positions for player/computer cards
-    - Center play area for battling cards
-    - Card sprites and artwork display
+### Сравнение карт и элементальные эффекты
+![image3](image3)
+_В центре — сравнение карт игрока и компьютера, всплывающие эффекты и индикация способностей._
 
-11. **Game State Feedback**
-    - Round result messages
-    - Ability activation notifications
-    - Card count displays
-    - Game over announcements
+### Экран победы и результат раунда
+![image4](image4)
+_Сообщение о победе, количество карт, итог сравнения и визуальные эффекты._
 
-### Game Flow Mechanics
-12. **Round System**
-    - Space bar to initiate rounds
-    - Automatic hand refresh after rounds
-    - Delay between rounds for effect viewing
+---
 
-13. **Game Progression**
-    - Automatic win condition checking
-    - Game reset after victory
-    - Continuous play loop
+## Core Gameplay Mechanics
 
-14. **UI System**
-    - Player/computer card counters
-    - Battle result text display
-    - Ability message popups
+### 1. Basic Card Battle System
+- Сравнение карт игрока и компьютера
+- Случайный выбор карт из руки
+- Сравнение силы (power) для определения победителя
+- Условия победы/проигрыша/ничьи
 
-### Technical Mechanics
-15. **Object Pooling**
-    - Card instantiation/destruction
-    - Effect particle management
-    - Tag-based card tracking
+### 2. Deck System
+- Перемешивание колоды при старте игры
+- Вытягивание карт обоими игроками
+- Удаление карт из колоды после вытягивания
+- Настраиваемый стартовый размер руки
 
-16. **Game Balancing**
-    - Configurable starting hand size
-    - Adjustable ability values
-    - Elemental multiplier tuning
+### 3. Hand Management
+- Визуальное отображение карт в руке
+- Карты противника показываются рубашкой
+- Отслеживание количества карт
+
+---
+
+## Elemental Affinity System
+
+### 4. Element Types
+- Огонь (Fire), Вода (Water), Земля (Earth)
+- Нейтральный элемент (None)
+
+### 5. Elemental Strengths/Weaknesses
+- Огонь побеждает Землю (в 2 раза сильнее)
+- Земля побеждает Воду (в 2 раза сильнее)
+- Вода побеждает Огонь (в 2 раза сильнее)
+- Слабые элементы наносят половинный урон
+
+### 6. Elemental Visuals
+- Цветные партиклы при баттле
+- Иконки элементов на картах
+- Цветовая индикация элементов
+
+---
+
+## Special Ability System
+
+### 7. Ability Types
+- Draw Extra: вытянуть доп. карту при победе
+- Steal Card: украсть карту соперника при победе
+- Destroy on Loss: уничтожить карту оппонента при проигрыше
+- Double Power: усилить силу при проигрыше
+- Revive Random: вернуть случайную карту из колоды
+
+### 8. Ability Triggers
+- Активация способности при победе
+- Активация способности при проигрыше
+- Условная активация
+
+### 9. Ability Visuals
+- Пульсирующая индикация способностей
+- Уникальные иконки для каждого типа
+- Цветовые выделения карт со способностями
+- Сообщения об активации способности
+
+---
+
+## Visual Feedback Systems
+
+### 10. Card Display
+- Разные позиции для карт игрока/компьютера
+- Центральная зона для баттла
+- Отображение артов и спрайтов карт
+
+### 11. Game State Feedback
+- Сообщения о результате раунда
+- Уведомления об активации способностей
+- Отображение количества карт
+- Анонсы Game Over
+
+---
+
+## Game Flow Mechanics
+
+### 12. Round System
+- Запуск раунда по клавише пробел
+- Автоматическое обновление руки после раунда
+- Задержка между раундами для просмотра эффектов
+
+### 13. Game Progression
+- Автоматическая проверка условий победы
+- Сброс игры после победы
+- Непрерывный игровой цикл
+
+### 14. UI System
+- Счетчики карт игрока/компьютера
+- Текст результата баттла
+- Всплывающие сообщения о способностях
+
+---
+
+## Technical Mechanics
+
+### 15. Object Pooling
+- Создание/уничтожение карт
+- Управление партиклами эффектов
+- Отслеживание карт по тегам
+
+### 16. Game Balancing
+- Настраиваемый размер стартовой руки
+- Регулировка значений способностей
+- Настройка множителей элементов
+
+---
+
+## Технологии
+
+- **ShaderLab** — визуальные эффекты и материалы
+- **C#** — игровая логика, контроллеры, UI
+- **HLSL** — кастомные шейдеры
+- **Mathematica** — генерация/обработка игровых данных
+
+---
+
+## Как запустить
+
+1. Откройте проект в Unity 6.
+2. Запустите сцену `SampleScene`.
+3. Нажмите Play — игра начнется автоматически.
+
+---
+
+## Планы по развитию
+
+- Добавить больше правил и режимов
+- Реализовать мультиплеер
+- Улучшить визуальные эффекты, UI, анимации
+- Добавить новые способности и элементы
+
+---
+
+## Автор
+
+**ivanshevchuk0**
+
+---
+
+Есть вопросы или предложения? Создайте issue или pull request!
